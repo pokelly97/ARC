@@ -4,20 +4,38 @@ import os, sys
 import json
 import numpy as np
 import re
+from collections import Counter
 
 ### YOUR CODE HERE: write at least three functions which solve
 ### specific tasks by transforming the input x and returning the
 ### result. Name them according to the task ID as in the three
 ### examples below. Delete the three examples. The tasks you choose
 ### must be in the data/training directory, not data/evaluation.
-def solve_6a1e5592(x):
-    return x
+#def solve_f25ffba3(x):
+#    out_arr = x.copy()
+#    shape = x.shape
+#    half_height = shape[0] / 2
+#    for j in range(shape[1]):
+#        for i in range(int(half_height)):
+#            out_arr[i, j] = x[shape[0]-1-i, j]
+#    return out_arr   
+    
+def solve_9af7a82c(x):
+    count_dict = Counter()
+    shape = x.shape
+    for i in range(shape[0]):
+        for j in range(shape[1]):
+            count_dict[x[i, j]] += 1
+    shape_1 = len(count_dict)
+    shape_0 = max(count_dict.values())
+    out_arr = np.zeros((shape_0, shape_1), int)
+    for j, item in enumerate(sorted(count_dict.items(), 
+                         key=lambda x: count_dict[x[0]], 
+                         reverse=True)):
+        out_arr[:item[1], j] = item[0]
+    
+    return out_arr
 
-def solve_b2862040(x):
-    return x
-
-def solve_05269061(x):
-    return x
 
 
 def main():
