@@ -5,6 +5,7 @@ import json
 import numpy as np
 import re
 from collections import Counter
+from itertools import product
 
 ### YOUR CODE HERE: write at least three functions which solve
 ### specific tasks by transforming the input x and returning the
@@ -20,22 +21,74 @@ from collections import Counter
 #            out_arr[i, j] = x[shape[0]-1-i, j]
 #    return out_arr   
     
-def solve_9af7a82c(x):
-    count_dict = Counter()
-    shape = x.shape
-    for i in range(shape[0]):
-        for j in range(shape[1]):
-            count_dict[x[i, j]] += 1
-    shape_1 = len(count_dict)
-    shape_0 = max(count_dict.values())
-    out_arr = np.zeros((shape_0, shape_1), int)
-    for j, item in enumerate(sorted(count_dict.items(), 
-                         key=lambda x: count_dict[x[0]], 
-                         reverse=True)):
-        out_arr[:item[1], j] = item[0]
+#def solve_9af7a82c(x):
+#    count_dict = Counter()
+#    shape = x.shape
+#    for i in range(shape[0]):
+#        for j in range(shape[1]):
+#            count_dict[x[i, j]] += 1
+#    shape_1 = len(count_dict)
+#    shape_0 = max(count_dict.values())
+#    out_arr = np.zeros((shape_0, shape_1), int)
+#    for j, item in enumerate(sorted(count_dict.items(), 
+#                         key=lambda x: count_dict[x[0]], 
+#                         reverse=True)):
+#        out_arr[:item[1], j] = item[0]
+#    
+#    return out_arr
+
+def perform_search(x, center):
+    height, width = x.shape
+    red = 2
+    j, i = center
+    bounds = [j, j, i, i]
+    
+    neighbourhood = [(row, col) for row in range(j, j+3) for col in range(i-2, i+3) if (row in range(height) and col in range(width))]
+    checked = [(index, x[index]==red) for index in neighbourhood]
+    
+    red_squares = [tup[0] for tup in checked if tup[1]==True]
+    bounds[1] = max([index[0] for index in red_squares])
+    bounds[2] = min([index[1] for index in red_squares])
+    bounds[3] = max([index[1] for index in red_squares]) 
+            
+    return bounds
+    
+    
+def solve_36fdfd69(x):
+    height, width = x.shape
+    out_arr = x.copy()
+    
+    counts = np.bincount(x.flatten())
+    colour_counts = counts[1:]
+    majority_colour = np.argmax(colour_counts)
+    red = 2
+    yellow = 4
+    
+    skip = []
+    
+    for j in range(x.shape[0]):
+        for i in range(x.shape[1]):
+            if x[j, i] == red:
+                center = (j, i)
+                bounds = [j, j, i, i]
+                for iteration in range(2):
+                    corner_bounds = [bounds]
+                    corners = set(product(bounds[:2], bounds[2:]))     
+                    for corner in corners:
+                        corner_bounds.append(perform_search(x, center))
+                    corner_array = np.array(corner_bounds)
+                    bounds[1] = max(corner_array[:, 1])
+                    bounds[2] = min(corner_array[:, 2])
+                    bounds[3] = max(corner_array[:, 3])
+                
+                    
+                to_fill = [(row, col) for row in range(bounds[0], bounds[1]+1) for col in range(bounds[2], bounds[3]+1) if x[row, col] != red]
+                
+                for index in to_fill:
+                    out_arr[index] = yellow
+    
     
     return out_arr
-
 
 
 def main():
