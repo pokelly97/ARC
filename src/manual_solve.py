@@ -12,41 +12,51 @@ from itertools import product
 ### result. Name them according to the task ID as in the three
 ### examples below. Delete the three examples. The tasks you choose
 ### must be in the data/training directory, not data/evaluation.
-#def solve_f25ffba3(x):
-#    out_arr = x.copy()
-#    shape = x.shape
-#    half_height = shape[0] / 2
-#    for j in range(shape[1]):
-#        for i in range(int(half_height)):
-#            out_arr[i, j] = x[shape[0]-1-i, j]
-#    return out_arr   
+def solve_f25ffba3(x):
+    out_arr = x.copy()
+    shape = x.shape
+    half_height = shape[0] / 2
+    for j in range(shape[1]):
+        for i in range(int(half_height)):
+            # assign top row the value of corresponding lower row in same column
+            out_arr[i, j] = x[shape[0]-1-i, j]
+    return out_arr   
     
-#def solve_9af7a82c(x):
-#    count_dict = Counter()
-#    shape = x.shape
-#    for i in range(shape[0]):
-#        for j in range(shape[1]):
-#            count_dict[x[i, j]] += 1
-#    shape_1 = len(count_dict)
-#    shape_0 = max(count_dict.values())
-#    out_arr = np.zeros((shape_0, shape_1), int)
-#    for j, item in enumerate(sorted(count_dict.items(), 
-#                         key=lambda x: count_dict[x[0]], 
-#                         reverse=True)):
-#        out_arr[:item[1], j] = item[0]
-#    
-#    return out_arr
+def solve_9af7a82c(x):
+    count_dict = Counter()
+    shape = x.shape
+    # create counter for colours
+    for i in range(shape[0]):
+        for j in range(shape[1]):
+            count_dict[x[i, j]] += 1
+    shape_1 = len(count_dict) # a column for each colour
+    shape_0 = max(count_dict.values()) # num rows is max colour count
+    out_arr = np.zeros((shape_0, shape_1), int) # initialize
+    # assign columns in order of counts
+    for j, item in enumerate(sorted(count_dict.items(), 
+                         key=lambda x: count_dict[x[0]], 
+                         reverse=True)):
+        out_arr[:item[1], j] = item[0]
+    
+    return out_arr
 
 def perform_search(x, center):
+    '''Searches for red squares in a region to the left, right and
+    bottom of center square. When red squares are found, defines 
+    appropriate boundaries for region to be filled in'''
     height, width = x.shape
     red = 2
     j, i = center
     bounds = [j, j, i, i]
     
-    neighbourhood = [(row, col) for row in range(j, j+3) for col in range(i-2, i+3) if (row in range(height) and col in range(width))]
+    # define search neighbourhood of radius 2 squares around center
+    neighbourhood = [(row, col) for row in range(j-2, j+3) for col in range(i-2, i+3) if (row in range(height) and col in range(width))]
+    # check which neighbourhood squares are red
     checked = [(index, x[index]==red) for index in neighbourhood]
     
     red_squares = [tup[0] for tup in checked if tup[1]==True]
+    # update boundaries
+    bounds[0] = min([index[0] for index in red_squares])
     bounds[1] = max([index[0] for index in red_squares])
     bounds[2] = min([index[1] for index in red_squares])
     bounds[3] = max([index[1] for index in red_squares]) 
@@ -58,35 +68,39 @@ def solve_36fdfd69(x):
     height, width = x.shape
     out_arr = x.copy()
     
-    counts = np.bincount(x.flatten())
-    colour_counts = counts[1:]
-    majority_colour = np.argmax(colour_counts)
-    red = 2
-    yellow = 4
+    counts = np.bincount(x.flatten()) # finds distribution of colours in array
+    colour_counts = counts[1:] # non-black
+    majority_colour = np.argmax(colour_counts) # colour is variable, but is always the majority other than black
+    red = 2 # target areas always defined by red
+    yellow = 4 # desired fill is always yellow
     
-    skip = []
+    skip = [] # checked indices to skip to improve efficiency
     
-    for j in range(x.shape[0]):
-        for i in range(x.shape[1]):
-            if x[j, i] == red:
+    for j in range(x.shape[0]): # rows
+        for i in range(x.shape[1]): # columns
+            if x[j, i] == red:# and (j, i) not in skip:
                 center = (j, i)
-                bounds = [j, j, i, i]
-                for iteration in range(2):
+                bounds = [j, j, i, i] # initial boundaries are the one square
+                for iteration in range(3):
+                    # all regions can be found in 2 iter's, doing 3 to be safe with unseen cases, and compute is no problem
                     corner_bounds = [bounds]
-                    corners = set(product(bounds[:2], bounds[2:]))     
+                    corners = set(product(bounds[:2], bounds[2:])) # all corners of region so far
+                    skip.extend([(row, col) for row in range(bounds[0], bounds[1]+1) for col in range(bounds[2], bounds[3]+1)]) # skip all squares in checked area
                     for corner in corners:
-                        corner_bounds.append(perform_search(x, center))
+                        # perform scan of area around corner for red squares
+                        corner_bounds.append(perform_search(x, corner))
+                    # find new outer corners of area
                     corner_array = np.array(corner_bounds)
+                    bounds[0] = min(corner_array[:, 0])
                     bounds[1] = max(corner_array[:, 1])
                     bounds[2] = min(corner_array[:, 2])
                     bounds[3] = max(corner_array[:, 3])
                 
-                    
                 to_fill = [(row, col) for row in range(bounds[0], bounds[1]+1) for col in range(bounds[2], bounds[3]+1) if x[row, col] != red]
                 
+                # turn all non-red squares inside boundary yellow
                 for index in to_fill:
                     out_arr[index] = yellow
-    
     
     return out_arr
 
