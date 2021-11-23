@@ -9,6 +9,14 @@ A complete description of the dataset, its goals, and its underlying logic, can 
 As a reminder, a test-taker is said to solve a task when, upon seeing the task for the first time, they are able to produce the correct output grid for *all* test inputs in the task (this includes picking the dimensions of the output grid). For each test input, the test-taker is allowed 3 trials (this holds for all test-takers, either humans or AI).
 
 
+## Used as part of Programming module for NUIG MSc in AI
+
+This repository was used as a programming exercise to solve a selection of ARC tasks using python. The aim is to use python libraries to write functions which generalise to any instance of a certain task, and solve it correctly.
+
+Some tasks are found to be more difficult than others, requiring more complex code to be written, even if they may be more intuitive to solve by a human in the html interface. This is a prime example of the immense challenge of creating generally intelligent machines.
+
+
+
 ## Task file format
 
 The `data` directory contains two subdirectories:
