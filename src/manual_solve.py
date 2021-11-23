@@ -1,5 +1,11 @@
 #!/usr/bin/python
 
+# NAME: Philip O'Kelly
+# STUDENT ID: 21248593
+
+# GitHub Repo: https://github.com/pokelly97/ARC
+
+
 import os, sys
 import json
 import numpy as np
@@ -12,7 +18,13 @@ from itertools import product
 ### result. Name them according to the task ID as in the three
 ### examples below. Delete the three examples. The tasks you choose
 ### must be in the data/training directory, not data/evaluation.
+
 def solve_f25ffba3(x):
+    '''This task presents a grid with an empty top half and a pattern on the
+    bottom half. To solve the task, the bottom half pattern is to be reflected
+    across a horizontal line halfway up the grid, such that the top half is a
+    mirror image of the bottom.
+    '''
     out_arr = x.copy()
     shape = x.shape
     half_height = shape[0] / 2
@@ -23,6 +35,12 @@ def solve_f25ffba3(x):
     return out_arr   
     
 def solve_9af7a82c(x):
+    '''This task presents a grid with no blank spaces, all are coloured. It is
+    required to count how many cells of each present colour are present. The 
+    output is a grid of (max colour count * num of colours), with vertical strips
+    of each colour with a length equal to their count in the input, ordered from
+    left to right, most frequent colour first.
+    '''
     count_dict = Counter()
     shape = x.shape
     # create counter for colours
@@ -65,6 +83,13 @@ def perform_search(x, center):
     
     
 def solve_36fdfd69(x):
+    '''This task requires the detection of groups of red cells in a seemingly
+    random large grid of blank cells/cells of one other colour. It is required
+    to detect each group of red cells and define the smallest rectangular area
+    that encloses the group. Inside this rectangular area, every cell not red
+    is to be turned yellow. A helper function was defined to perform a cell 
+    neighbour search.
+    '''
     height, width = x.shape
     out_arr = x.copy()
     
@@ -106,6 +131,11 @@ def solve_36fdfd69(x):
 
 
 def solve_ff28f65a(x):
+    '''This task requires the counting of 2*2 squares of red cells in an
+    otherwise empty grid. The number of red squares defines the output, where
+    a blue cell for each is put into an empty 3*3 grid in a particular order -
+    top left, top right, centre, bottom left, bottom right.
+    '''
     out_arr = np.zeros((3,3))
     red = 2
     blue = 1
