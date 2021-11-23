@@ -24,14 +24,18 @@ def solve_f25ffba3(x):
     bottom half. To solve the task, the bottom half pattern is to be reflected
     across a horizontal line halfway up the grid, such that the top half is a
     mirror image of the bottom.
+    
+    Problem is solved by defining the j'th row to be the same as the height-j'th
+    row.
+    
+    All training and test grids were solved correctly.
     '''
     out_arr = x.copy()
     shape = x.shape
     half_height = shape[0] / 2
-    for j in range(shape[1]):
-        for i in range(int(half_height)):
-            # assign top row the value of corresponding lower row in same column
-            out_arr[i, j] = x[shape[0]-1-i, j]
+    for j in range(int(half_height)):
+        # assign top row the values of corresponding lower row
+        out_arr[j, :] = x[shape[0]-1-j, :]
     return out_arr   
     
 def solve_9af7a82c(x):
@@ -40,6 +44,11 @@ def solve_9af7a82c(x):
     output is a grid of (max colour count * num of colours), with vertical strips
     of each colour with a length equal to their count in the input, ordered from
     left to right, most frequent colour first.
+    
+    A counter object is used to count colour counts, and the sorted colours
+    and their counts are filled in left to right.
+    
+    All training and test grids were solved correctly.
     '''
     count_dict = Counter()
     shape = x.shape
@@ -61,7 +70,8 @@ def solve_9af7a82c(x):
 def perform_search(x, center):
     '''Searches for red squares in a region to the left, right and
     bottom of center square. When red squares are found, defines 
-    appropriate boundaries for region to be filled in'''
+    appropriate boundaries for region to be filled in.
+    '''
     height, width = x.shape
     red = 2
     j, i = center
@@ -89,6 +99,15 @@ def solve_36fdfd69(x):
     that encloses the group. Inside this rectangular area, every cell not red
     is to be turned yellow. A helper function was defined to perform a cell 
     neighbour search.
+    
+    The colours are found by finding the most common colour, and defining others
+    manually. The grid is parsed top to bottom, left to right until a red square
+    is found. A neighbourhood search of cells within a 2 cell radius is done
+    and the corner boundaries are readjusted accordingly. A list of indices to 
+    skip is defined within the bounds to save resources. The insides of regions
+    are then coloured yellow.
+    
+    All training and test grids were solved correctly.
     '''
     height, width = x.shape
     out_arr = x.copy()
@@ -135,6 +154,14 @@ def solve_ff28f65a(x):
     otherwise empty grid. The number of red squares defines the output, where
     a blue cell for each is put into an empty 3*3 grid in a particular order -
     top left, top right, centre, bottom left, bottom right.
+    
+    The grid is parsed from top to bottom, left to right until we come in contact
+    with the top left corner of a square. The other cells in the square are added
+    to a skip list and the square count is increased. A dict is used to define
+    where each blue cell should go, and a range is used to fill these in in 
+    order.
+    
+    All training and test grids were solved correctly.
     '''
     out_arr = np.zeros((3,3))
     red = 2
@@ -152,6 +179,33 @@ def solve_ff28f65a(x):
     for i in range(1, num_squares + 1):
         out_arr[blue_placements[i]] = blue
     return out_arr
+
+
+# SUMMARY:
+# The main and only package that I used in these tasks was numpy, and this was 
+# merely for creating empty grids to use for the output. The vast majority of
+# the assignment is possible using pure python and logic. I found that lists
+# of tuples come in very useful, as they are similar in utility to dictionaries,
+# but it's possible to link the 'value' back to the 'key' in a list comprehension.
+#
+# The most difficult part of the selection of tasks that I found was performing a 
+# search with moving boundaries in the third task. This is especially difficult when
+# dealing with irregular and unpredictable shapes, as was the case. I set a hard-
+# coded number of search iterations that comfortably allowed every shape in the
+# training and testing grids to be found. I had been working on a solution that 
+# kept track of whether the boundaries had changed in that iteration or not, and if
+# not then the loop would terminate, but this didn't always work and required an 
+# extra iteration in every case. I suspect that this is a common problem in object
+# detection for computer vision, as in the real world not many objects are of a 
+# predictable size.
+#
+# Another tool that I used was skip lists, which skip certain cells of the grids 
+# when they are certain to be of no interest to us. For example, when parsing from 
+# top to bottom and left to right in the fourth task, it was guaranteed that the cell
+# to the right, bottom, and bottom right of the first red cell would be red as well.
+# This method could be very useful when using brute-force searches such as those used
+# here.
+
     
 
 def main():
