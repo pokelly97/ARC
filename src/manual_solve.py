@@ -78,7 +78,7 @@ def solve_36fdfd69(x):
     
     for j in range(x.shape[0]): # rows
         for i in range(x.shape[1]): # columns
-            if x[j, i] == red:# and (j, i) not in skip:
+            if x[j, i] == red and (j, i) not in skip:
                 center = (j, i)
                 bounds = [j, j, i, i] # initial boundaries are the one square
                 for iteration in range(3):
@@ -104,6 +104,25 @@ def solve_36fdfd69(x):
     
     return out_arr
 
+
+def solve_ff28f65a(x):
+    out_arr = np.zeros((3,3))
+    red = 2
+    blue = 1
+    num_squares = 0
+    skip = []
+    for j in range(x.shape[0]): # rows
+        for i in range(x.shape[1]): # columns
+            if x[j, i] == red and ((j, i) not in skip):
+                num_squares += 1
+                # parsing method ensures we get top left cell of square, add others to skip
+                skip.extend([(j+1, i), (j, i+1), (j+1, i+1)]) 
+    # where to place the blue square for the 1st, 2nd ... red square
+    blue_placements = {1:(0, 0), 2:(0, 2), 3:(1, 1), 4:(2, 0), 5:(2, 2)}
+    for i in range(1, num_squares + 1):
+        out_arr[blue_placements[i]] = blue
+    return out_arr
+    
 
 def main():
     # Find all the functions defined in this file whose names are
